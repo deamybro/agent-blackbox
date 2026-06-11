@@ -7,5 +7,5 @@ export const blackbox = {
   check: (proposal: Proposal) => checkRisk(proposal),
   record: (proposal: Proposal) => processProposal(proposal),
   runSimulation: (proposal: Proposal) => processProposal(proposal),
-  getAuditTrail: () => getDecisions()
+  getAuditTrail: async () => await getDecisions()
 };

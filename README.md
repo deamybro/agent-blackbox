@@ -70,16 +70,17 @@ npm run build
 npm start
 ```
 
-## Deploy
+## Free deployment
 
-The repository includes `render.yaml` for a Render Blueprint deployment with a persistent disk mounted at `/var/data` and `DATABASE_URL=/var/data/blackbox.db`.
+The app supports a no-card serverless deployment using **Vercel Hobby + Neon Free Postgres**:
 
-1. Push the repository to GitHub.
-2. In Render, create a new Blueprint and select the repository.
-3. Confirm the Starter web service and persistent disk.
-4. Set `NEXT_PUBLIC_APP_URL` to the deployed service URL after creation.
+1. Create a free Neon project and copy its Postgres connection string.
+2. Import this repository into Vercel.
+3. Add `DATABASE_URL` with the Neon connection string.
+4. Add `NEXT_PUBLIC_APP_URL` with the Vercel project URL.
+5. Deploy. Tables are created automatically on first request.
 
-Vercel is not recommended for the current SQLite version because its filesystem is ephemeral.
+Local development continues to use SQLite when `DATABASE_URL=data/blackbox.db`.
 
 ## Three-minute demo
 

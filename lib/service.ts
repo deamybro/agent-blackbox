@@ -6,9 +6,8 @@ import { checkRisk } from "@/lib/risk/engine";
 import { simulateTrade } from "@/lib/simulation/engine";
 import type { Decision, Proposal } from "@/lib/types";
 
-export function processProposal(proposal: Proposal): Decision {
-  const recent = getDecisions(30);
-  const balance = currentBalance();
+export async function processProposal(proposal: Proposal): Promise<Decision> {
+  const [recent, balance] = await Promise.all([getDecisions(30), currentBalance()]);
   let peak = 100000;
   recent.forEach(d => { peak = Math.max(peak, d.balanceAfter); });
   const drawdown = peak ? (peak - balance) / peak : 0;
@@ -22,15 +21,15 @@ export function processProposal(proposal: Proposal): Decision {
     tradeStatus: risk.verdict === "BLOCK" ? "BLOCKED" : risk.verdict === "HUMAN_REVIEW" ? "REVIEW" : proposal.side === "HOLD" ? "HELD" : "EXECUTED",
     resultPnL: sim.pnl, exitPrice: sim.exitPrice, balanceAfter: sim.balanceAfter, postTradeReview: sim.review
   };
-  return saveDecision(decision);
+  return await saveDecision(decision);
 }
 
-export function runCycle(scenario: "auto" | "safe" | "dangerous" = "auto") {
+export async function runCycle(scenario: "auto" | "safe" | "dangerous" = "auto") {
   return processProposal(createProposal(scenario));
 }
 
 export async function runMainnetPaperCycle(scenario: "auto" | "safe" | "dangerous" = "auto") {
   const proposal = createProposal(scenario);
-  if (scenario === "dangerous") return processProposal(proposal);
-  return processProposal(await hydrateWithBitgetMarket(proposal));
+  if (scenario === "dangerous") return await processProposal(proposal);
+  return await processProposal(await hydrateWithBitgetMarket(proposal));
 }
